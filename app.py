@@ -157,7 +157,7 @@ def send():
         push_log("PUB-SUB", "PUBLISH", f"Client publish event: {order_text}")
         time.sleep(random.uniform(0.1, 0.25))
 
-        pubsub_messages.append(f"🔔 Topic coffee.order: {order_text}")
+        pubsub_messages.append(f"Topic coffee.order: {order_text}")
 
         push_log("PUB-SUB", "SUBSCRIBE", "Kitchen Service menerima event")
 
@@ -169,7 +169,7 @@ def send():
         result = {
             "ok": True,
             "model": "publish",
-            "response": "📡 Event berhasil dipublish ke subscriber",
+            "response": "Event berhasil dipublish ke subscriber",
         }
 
     # =========================
