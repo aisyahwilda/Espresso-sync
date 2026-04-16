@@ -1,0 +1,1277 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kopi Kenangan</title>
+    <script src="https://unpkg.com/vue@3"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --espresso: #120907;
+        --dark-mocha: #1f1412;
+        --latte: #d6ad60;
+        --cream: #f4ebd0;
+        --gold-leaf: #b68d40;
+        --sugar: #f2d9a6;
+        --glass: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      body {
+        background-color: var(--espresso);
+        background-image: radial-gradient(
+          circle at 50% -20%,
+          #3d2b27 0%,
+          var(--espresso) 80%
+        );
+        color: var(--cream);
+        margin: 0;
+        padding: 30px;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1300px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        gap: 30px;
+      }
+
+      /* --- LEFT PANEL: Glassmorphism --- */
+      .shop-panel {
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 25px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      .brand-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--latte);
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      label {
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--gold-leaf);
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      select,
+      input,
+      textarea {
+        width: 100%;
+        padding: 12px 16px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--glass-border);
+        color: var(--cream);
+        border-radius: 12px;
+        margin-bottom: 20px;
+        outline: none;
+      }
+
+      select:focus,
+      input:focus {
+        border-color: var(--latte);
+        background: rgba(214, 173, 96, 0.05);
+      }
+
+      .cart-box {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 16px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px dashed var(--glass-border);
+      }
+
+      .cart-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .menu-builder {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        padding: 12px;
+        margin-bottom: 18px;
+      }
+
+      .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .menu-chip {
+        border: 1px solid rgba(214, 173, 96, 0.22);
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--cream);
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 10px 9px;
+        cursor: pointer;
+        text-align: left;
+      }
+
+      .menu-chip:hover {
+        border-color: rgba(214, 173, 96, 0.58);
+        transform: translateY(-2px);
+      }
+
+      .menu-chip.active {
+        border-color: var(--latte);
+        background: rgba(214, 173, 96, 0.12);
+        box-shadow: 0 8px 18px rgba(214, 173, 96, 0.12);
+      }
+
+      .qty-add-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .qty-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--glass-border);
+        border-radius: 10px;
+        padding: 4px;
+        background: rgba(0, 0, 0, 0.16);
+      }
+
+      .qty-btn {
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 8px;
+        background: rgba(214, 173, 96, 0.18);
+        color: var(--cream);
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .qty-btn:hover {
+        background: rgba(214, 173, 96, 0.34);
+      }
+
+      .qty-input {
+        width: 52px;
+        margin-bottom: 0;
+        text-align: center;
+        padding: 8px 10px;
+      }
+
+      .add-cart-btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        color: var(--espresso);
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--latte), var(--sugar));
+        box-shadow: 0 8px 20px rgba(214, 173, 96, 0.2);
+      }
+
+      .add-cart-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.06);
+      }
+
+      .method-segment {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .method-pill {
+        border: 1px solid rgba(214, 173, 96, 0.22);
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--cream);
+        border-radius: 11px;
+        padding: 10px 6px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .method-pill:hover {
+        border-color: rgba(214, 173, 96, 0.58);
+        transform: translateY(-2px);
+      }
+
+      .method-pill.active {
+        border-color: var(--latte);
+        background: rgba(214, 173, 96, 0.15);
+        box-shadow: 0 8px 16px rgba(214, 173, 96, 0.16);
+      }
+
+      .address-box {
+        margin-bottom: 14px;
+        animation: slideDown 0.28s ease;
+      }
+
+      .location-search {
+        position: relative;
+        margin-bottom: 14px;
+      }
+
+      .location-search i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 14px;
+      }
+
+      .location-search input {
+        margin-bottom: 0;
+        padding-left: 40px;
+      }
+
+      .location-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+        max-height: 230px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .location-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        padding: 12px;
+        cursor: pointer;
+      }
+
+      .location-card.active {
+        border-color: var(--latte);
+        box-shadow: 0 0 0 1px rgba(214, 173, 96, 0.35);
+        background: rgba(214, 173, 96, 0.08);
+      }
+
+      .distance-pill {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        color: #2b6cb0;
+        background: #e7f1ff;
+        border-radius: 8px;
+        padding: 3px 7px;
+        margin-bottom: 8px;
+      }
+
+      .location-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--cream);
+        margin-bottom: 4px;
+      }
+
+      .location-address {
+        font-size: 12px;
+        color: rgba(244, 235, 208, 0.72);
+        margin-bottom: 8px;
+        line-height: 1.4;
+      }
+
+      .service-row {
+        display: flex;
+        gap: 10px;
+        font-size: 11px;
+        font-weight: 600;
+        color: rgba(244, 235, 208, 0.92);
+      }
+
+      .service-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+      }
+
+      .service-dot.delivery {
+        background: #67be4b;
+      }
+      .service-dot.pickup {
+        background: #46d1c5;
+      }
+      .service-dot.drive {
+        background: #6f5bd8;
+      }
+
+      .selected-outlet {
+        background: rgba(214, 173, 96, 0.11);
+        border: 1px dashed rgba(214, 173, 96, 0.45);
+        color: var(--cream);
+        font-size: 12px;
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin-bottom: 18px;
+      }
+
+      /* --- RIGHT PANEL: Visualizer --- */
+      .visual-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+      }
+
+      .model-tabs {
+        display: flex;
+        background: var(--glass);
+        padding: 6px;
+        border-radius: 16px;
+        border: 1px solid var(--glass-border);
+      }
+
+      .tab-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        background: transparent;
+        color: var(--gold-leaf);
+        cursor: pointer;
+        font-weight: 600;
+        border-radius: 12px;
+      }
+
+      .tab-btn.active {
+        background: var(--gold-leaf);
+        color: var(--espresso);
+        box-shadow: 0 4px 15px rgba(182, 141, 64, 0.3);
+      }
+
+      /* Topology Map */
+      .topology-map {
+        height: 320px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 24px;
+        position: relative;
+        border: 1px solid var(--glass-border);
+        overflow: hidden;
+      }
+
+      .topology-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+
+      .topology-line {
+        stroke: rgba(255, 255, 255, 0.18);
+        stroke-width: 3;
+        stroke-linecap: round;
+      }
+
+      .topology-line.active {
+        stroke: var(--latte);
+        stroke-width: 4;
+        stroke-dasharray: 12 8;
+        animation: dashFlow 0.9s linear infinite;
+        filter: drop-shadow(0 0 4px rgba(214, 173, 96, 0.45));
+      }
+
+      .map-caption {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        background: rgba(18, 9, 7, 0.78);
+        border: 1px solid rgba(214, 173, 96, 0.2);
+      }
+
+      .mode-badge {
+        padding: 3px 9px;
+        border-radius: 999px;
+        font-size: 10px;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        font-weight: 800;
+        color: var(--espresso);
+        background: var(--latte);
+        white-space: nowrap;
+      }
+
+      .map-caption-text {
+        font-size: 12px;
+        color: var(--cream);
+        font-weight: 600;
+        line-height: 1.35;
+      }
+
+      .packet-chip {
+        position: absolute;
+        z-index: 4;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        color: var(--espresso);
+        background: linear-gradient(135deg, var(--latte), var(--sugar));
+        box-shadow: 0 0 0 3px rgba(214, 173, 96, 0.2);
+        animation: pulsePacket 0.8s ease-in-out infinite;
+      }
+
+      .packet-chip.packet-cg {
+        left: 25%;
+        top: 50%;
+      }
+      .packet-chip.packet-gp {
+        left: 53%;
+        top: 39%;
+      }
+      .packet-chip.packet-pk {
+        left: 66%;
+        top: 50%;
+      }
+      .packet-chip.packet-gk {
+        left: 53%;
+        top: 61%;
+      }
+      .packet-chip.packet-kn {
+        left: 80%;
+        top: 61%;
+      }
+
+      .flow-track {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .flow-step {
+        border: 1px solid var(--glass-border);
+        border-radius: 999px;
+        padding: 5px 10px;
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(244, 235, 208, 0.75);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .flow-step.active {
+        color: var(--espresso);
+        border-color: var(--latte);
+        background: var(--latte);
+        box-shadow: 0 0 0 2px rgba(214, 173, 96, 0.25);
+      }
+
+      .flow-step.done {
+        color: #9fdba6;
+        border-color: rgba(159, 219, 166, 0.35);
+        background: rgba(159, 219, 166, 0.08);
+      }
+
+      .map-flow-track {
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: 10px;
+        z-index: 3;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        align-items: center;
+        justify-content: center;
+        background: rgba(18, 9, 7, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        padding: 8px;
+      }
+
+      .node {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        z-index: 2;
+        position: absolute;
+        transform: translate(-50%, -50%);
+      }
+
+      .node-client {
+        left: 12%;
+        top: 50%;
+      }
+      .node-gateway {
+        left: 37%;
+        top: 50%;
+      }
+      .node-payment {
+        left: 66%;
+        top: 33%;
+      }
+      .node-kitchen {
+        left: 66%;
+        top: 67%;
+      }
+      .node-notif {
+        left: 89%;
+        top: 50%;
+      }
+
+      .icon-circle {
+        width: 64px;
+        height: 64px;
+        background: var(--dark-mocha);
+        border: 2px solid var(--glass-border);
+        border-radius: 20px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        color: var(--latte);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .node.active .icon-circle {
+        border-color: var(--latte);
+        background: var(--latte);
+        color: var(--espresso);
+        transform: translateY(-10px);
+        box-shadow: 0 0 30px rgba(214, 173, 96, 0.4);
+      }
+
+      .node-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--gold-leaf);
+        text-transform: uppercase;
+      }
+
+      /* Message Particle Animation */
+      .particle {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: var(--latte);
+        border-radius: 50%;
+        filter: blur(2px);
+        z-index: 10;
+        box-shadow: 0 0 10px var(--latte);
+      }
+
+      /* Bottom Grid */
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+
+      .stat-card {
+        background: var(--glass);
+        padding: 20px;
+        border-radius: 20px;
+        text-align: center;
+        border: 1px solid var(--glass-border);
+      }
+
+      .stat-val {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--latte);
+        display: block;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: var(--gold-leaf);
+        opacity: 0.8;
+      }
+
+      .console-log {
+        background: #0a0504;
+        height: 180px;
+        border-radius: 20px;
+        padding: 20px;
+        font-family: "Space Mono", monospace;
+        font-size: 13px;
+        overflow-y: auto;
+        border: 1px solid var(--glass-border);
+        color: #a0a0a0;
+      }
+
+      .log-entry {
+        margin-bottom: 8px;
+        border-left: 2px solid var(--gold-leaf);
+        padding-left: 12px;
+      }
+
+      .confirm-btn {
+        background: linear-gradient(135deg, var(--gold-leaf), var(--sugar));
+        color: var(--espresso);
+        border: none;
+        width: 100%;
+        padding: 18px;
+        border-radius: 16px;
+        font-weight: 800;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .confirm-btn:hover {
+        transform: translateY(-3px);
+        filter: brightness(1.1);
+      }
+
+      .confirm-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Animation Keyframes */
+      @keyframes flow {
+        from {
+          opacity: 1;
+          transform: scale(1);
+        }
+        to {
+          opacity: 0;
+          transform: scale(2);
+        }
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes dashFlow {
+        to {
+          stroke-dashoffset: -40;
+        }
+      }
+
+      @keyframes pulsePacket {
+        0%,
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+          transform: translate(-50%, -50%) scale(1.08);
+        }
+      }
+
+      [v-cloak] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="container" v-cloak>
+      <aside class="shop-panel">
+        <div class="brand-title">
+          <i class="fas fa-mug-hot"></i> ESPRESSO-SYNC
+        </div>
+
+        <label><i class="fas fa-map-marker-alt"></i> Lokasi Outlet</label>
+        <div class="location-search">
+          <i class="fas fa-search"></i>
+          <input v-model="locationQuery" placeholder="Cari lokasi outlet..." />
+        </div>
+
+        <div class="location-list">
+          <div
+            v-for="outlet in filteredOutlets"
+            :key="outlet.id"
+            class="location-card"
+            :class="{ active: selectedOutletId === outlet.id }"
+            @click="selectOutlet(outlet.id)"
+          >
+            <div class="distance-pill">[[ outlet.distance ]]</div>
+            <div class="location-name">[[ outlet.name ]]</div>
+            <div class="location-address">[[ outlet.address ]]</div>
+            <div class="service-row">
+              <span><i class="service-dot delivery"></i>Delivery</span>
+              <span><i class="service-dot pickup"></i>Pickup</span>
+              <span v-if="outlet.driveThru"
+                ><i class="service-dot drive"></i>Drive Thru</span
+              >
+            </div>
+          </div>
+          <div v-if="filteredOutlets.length === 0" class="location-card">
+            Outlet tidak ditemukan.
+          </div>
+        </div>
+
+        <div v-if="selectedOutlet" class="selected-outlet">
+          <strong>Outlet dipilih:</strong> [[ selectedOutlet.name ]]
+        </div>
+
+        <label><i class="fas fa-coffee"></i> Tambah Menu</label>
+        <div class="menu-builder">
+          <div class="menu-grid">
+            <button
+              v-for="menu in menuOptions"
+              :key="menu"
+              class="menu-chip"
+              :class="{ active: selectedItem === menu }"
+              @click="selectedItem = menu"
+            >
+              [[ menu ]]
+            </button>
+          </div>
+          <div class="qty-add-row">
+            <div class="qty-control">
+              <button class="qty-btn" @click="decreaseQty">-</button>
+              <input type="number" v-model="itemQty" class="qty-input" />
+              <button class="qty-btn" @click="increaseQty">+</button>
+            </div>
+            <button @click="addToCart" class="add-cart-btn">
+              <i class="fas fa-plus"></i> Tambah
+            </button>
+          </div>
+        </div>
+
+        <div v-if="cart.length > 0" class="cart-box">
+          <label style="margin-bottom: 10px">Pesanan Kamu</label>
+          <div v-for="(item, i) in cart" :key="i" class="cart-item">
+            <span>[[ item.qty ]]x [[ item.name ]]</span>
+            <span style="color: var(--latte)"
+              >Rp [[ (item.qty * 18000).toLocaleString() ]]</span
+            >
+          </div>
+        </div>
+
+        <label><i class="fas fa-truck"></i> Metode</label>
+        <div class="method-segment">
+          <button
+            class="method-pill"
+            :class="{ active: method === 'pickup' }"
+            @click="method='pickup'"
+          >
+            <i class="fas fa-bag-shopping"></i> Pickup
+          </button>
+          <button
+            class="method-pill"
+            :class="{ active: method === 'dinein' }"
+            @click="method='dinein'"
+          >
+            <i class="fas fa-utensils"></i> Dine In
+          </button>
+          <button
+            class="method-pill"
+            :class="{ active: method === 'delivery' }"
+            @click="method='delivery'"
+          >
+            <i class="fas fa-motorcycle"></i> Delivery
+          </button>
+        </div>
+
+        <div v-if="method === 'delivery'" class="address-box">
+          <input v-model="address" placeholder="Alamat pengiriman..." />
+        </div>
+
+        <button class="confirm-btn" @click="processOrder" :disabled="loading">
+          <span v-if="!loading">KONFIRMASI PESANAN</span>
+          <span v-else
+            ><i class="fas fa-spinner fa-spin"></i> MEMPROSES...</span
+          >
+        </button>
+      </aside>
+
+      <main class="visual-panel">
+        <nav class="model-tabs">
+          <button
+            class="tab-btn"
+            :class="{active: mode==='request'}"
+            @click="mode='request'"
+          >
+            REQUEST-RESPONSE
+          </button>
+          <button
+            class="tab-btn"
+            :class="{active: mode==='publish'}"
+            @click="mode='publish'"
+          >
+            PUB-SUB
+          </button>
+          <button
+            class="tab-btn"
+            :class="{active: mode==='rpc'}"
+            @click="mode='rpc'"
+          >
+            RPC CALL
+          </button>
+        </nav>
+
+        <div class="topology-map">
+          <svg
+            class="topology-svg"
+            viewBox="0 0 760 320"
+            preserveAspectRatio="none"
+          >
+            <line
+              class="topology-line"
+              :class="{ active: activeLink === 'cg' }"
+              x1="90"
+              y1="160"
+              x2="280"
+              y2="160"
+            />
+            <line
+              class="topology-line"
+              :class="{ active: activeLink === 'gp' }"
+              x1="280"
+              y1="160"
+              x2="500"
+              y2="102"
+            />
+            <line
+              class="topology-line"
+              :class="{ active: activeLink === 'pk' }"
+              x1="500"
+              y1="102"
+              x2="500"
+              y2="218"
+            />
+            <line
+              class="topology-line"
+              :class="{ active: activeLink === 'gk' }"
+              x1="280"
+              y1="160"
+              x2="500"
+              y2="218"
+            />
+            <line
+              class="topology-line"
+              :class="{ active: activeLink === 'kn' }"
+              x1="500"
+              y1="218"
+              x2="675"
+              y2="160"
+            />
+          </svg>
+
+          <div class="map-caption">
+            <span class="mode-badge">[[ modeLabel ]]</span>
+            <span class="map-caption-text">[[ processMessage ]]</span>
+          </div>
+
+          <div
+            class="packet-chip"
+            v-if="loading && activeLink"
+            :class="'packet-' + activeLink"
+          >
+            [[ currentPacketTag ]]
+          </div>
+
+          <div
+            class="node node-client"
+            :class="{active: activeNode==='client'}"
+          >
+            <div class="icon-circle"><i class="fas fa-mobile-alt"></i></div>
+            <span class="node-label">Client</span>
+          </div>
+
+          <div
+            class="node node-gateway"
+            :class="{active: activeNode==='gateway'}"
+          >
+            <div class="icon-circle"><i class="fas fa-cloud"></i></div>
+            <span class="node-label">Gateway</span>
+          </div>
+
+          <div
+            class="node node-payment"
+            :class="{active: activeNode==='payment'}"
+          >
+            <div class="icon-circle"><i class="fas fa-credit-card"></i></div>
+            <span class="node-label">Payment</span>
+          </div>
+
+          <div
+            class="node node-kitchen"
+            :class="{active: activeNode==='kitchen'}"
+          >
+            <div class="icon-circle"><i class="fas fa-utensils"></i></div>
+            <span class="node-label">Kitchen</span>
+          </div>
+
+          <div class="node node-notif" :class="{active: activeNode==='notif'}">
+            <div class="icon-circle"><i class="fas fa-bell"></i></div>
+            <span class="node-label">Notif</span>
+          </div>
+
+          <div class="map-flow-track">
+            <span
+              v-for="(step, idx) in modelFlowSteps"
+              :key="step.node + '-' + idx"
+              class="flow-step"
+              :class="{ active: currentStepIndex === idx, done: currentStepIndex > idx }"
+            >
+              [[ idx + 1 ]]. [[ step.label ]]
+            </span>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <span class="stat-label">TOTAL TRANSAKSI</span>
+            <span class="stat-val">[[ stats.total_transactions ]]</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">LATENCY AVG</span>
+            <span class="stat-val">[[ stats.last_latency_ms ]]ms</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">SYSTEM TPM</span>
+            <span class="stat-val">[[ stats.throughput_per_minute ]]</span>
+          </div>
+        </div>
+
+        <div class="console-log" id="console">
+          <div v-for="log in logs" class="log-entry">
+            <span style="color: var(--latte)">[[ log.time ]]</span> › [[
+            log.detail ]]
+          </div>
+          <div v-if="logs.length === 0">
+            Sistem siap. Menunggu input pesanan...
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const { createApp } = Vue;
+
+      createApp({
+        delimiters: ["[[", "]]"],
+        data() {
+          return {
+            mode: "request",
+            locationQuery: "",
+            outlets: [
+              {
+                id: 1,
+                name: "Ruko Mekarsari Balikpapan",
+                address: "Jl. Ahmad Yani, Mekarsari, Balikpapan",
+                distance: "912.1 M",
+                driveThru: false,
+              },
+              {
+                id: 2,
+                name: "Ruko Pasar Segar",
+                address: "Jl. Segar Blok RB-10, Balikpapan Baru",
+                distance: "1.9 KM",
+                driveThru: false,
+              },
+              {
+                id: 3,
+                name: "Plaza Bunsay (Drive Thru)",
+                address: "Jl. Letjen Suprapto, Klandasan, Balikpapan",
+                distance: "2.3 KM",
+                driveThru: true,
+              },
+            ],
+            selectedOutletId: 1,
+            menuOptions: [
+              "Kopi Susu Gula Aren",
+              "Latte Macchiato",
+              "Matcha Espresso",
+              "Americano",
+            ],
+            selectedItem: "Kopi Susu Gula Aren",
+            itemQty: 1,
+            cart: [],
+            method: "pickup",
+            address: "",
+            activeNode: "client",
+            activeLink: "",
+            currentPacketTag: "",
+            currentStepIndex: -1,
+            processMessage: "Sistem standby. Pilih menu lalu kirim pesanan.",
+            loading: false,
+            stats: {
+              total_transactions: 0,
+              last_latency_ms: 0,
+              throughput_per_minute: 0,
+            },
+            logs: [],
+          };
+        },
+        computed: {
+          filteredOutlets() {
+            const query = this.locationQuery.trim().toLowerCase();
+            if (!query) {
+              return this.outlets;
+            }
+
+            return this.outlets.filter(
+              (outlet) =>
+                outlet.name.toLowerCase().includes(query) ||
+                outlet.address.toLowerCase().includes(query),
+            );
+          },
+          selectedOutlet() {
+            return (
+              this.outlets.find(
+                (outlet) => outlet.id === this.selectedOutletId,
+              ) || null
+            );
+          },
+          modeLabel() {
+            if (this.mode === "request") return "REQUEST-RESPONSE";
+            if (this.mode === "publish") return "PUBLISH-SUBSCRIBE";
+            return "RPC CALL";
+          },
+          modelFlowSteps() {
+            if (this.mode === "request") {
+              return [
+                {
+                  node: "gateway",
+                  link: "cg",
+                  tag: "REQ",
+                  label: "Client → Gateway (request order)",
+                },
+                {
+                  node: "payment",
+                  link: "gp",
+                  tag: "REQ",
+                  label: "Gateway → Payment (validasi)",
+                },
+                {
+                  node: "gateway",
+                  link: "gp",
+                  tag: "RES",
+                  label: "Payment → Gateway (hasil validasi)",
+                },
+                {
+                  node: "client",
+                  link: "cg",
+                  tag: "RES",
+                  label: "Gateway → Client (response status)",
+                },
+              ];
+            }
+
+            if (this.mode === "publish") {
+              return [
+                {
+                  node: "gateway",
+                  link: "cg",
+                  tag: "PUB",
+                  label: "Client publish event ke broker",
+                },
+                {
+                  node: "kitchen",
+                  link: "gk",
+                  tag: "EVT",
+                  label: "Broker distribusikan event ke kitchen",
+                },
+                {
+                  node: "notif",
+                  link: "kn",
+                  tag: "EVT",
+                  label: "Kitchen trigger notifikasi pelanggan",
+                },
+              ];
+            }
+
+            return [
+              {
+                node: "gateway",
+                link: "cg",
+                tag: "RPC",
+                label: "Client invoke RPC ke gateway",
+              },
+              {
+                node: "payment",
+                link: "gp",
+                tag: "RPC",
+                label: "Gateway panggil Payment Service",
+              },
+              {
+                node: "kitchen",
+                link: "pk",
+                tag: "RPC",
+                label: "Payment chain call ke Kitchen",
+              },
+              {
+                node: "gateway",
+                link: "gk",
+                tag: "RET",
+                label: "Kitchen return result ke gateway",
+              },
+              {
+                node: "client",
+                link: "cg",
+                tag: "RET",
+                label: "Gateway kirim hasil RPC ke client",
+              },
+            ];
+          },
+        },
+        methods: {
+          selectOutlet(outletId) {
+            this.selectedOutletId = outletId;
+          },
+          addToCart() {
+            const qty = Number.parseInt(this.itemQty, 10);
+            const safeQty = Number.isNaN(qty) || qty < 1 ? 1 : qty;
+            this.cart.push({ name: this.selectedItem, qty: safeQty });
+            this.itemQty = 1;
+            this.processMessage = `${safeQty}x ${this.selectedItem} ditambahkan ke pesanan.`;
+          },
+          increaseQty() {
+            const qty = Number.parseInt(this.itemQty, 10);
+            const safeQty = Number.isNaN(qty) || qty < 1 ? 1 : qty;
+            this.itemQty = safeQty + 1;
+          },
+          decreaseQty() {
+            const qty = Number.parseInt(this.itemQty, 10);
+            const safeQty = Number.isNaN(qty) || qty < 1 ? 1 : qty;
+            this.itemQty = Math.max(1, safeQty - 1);
+          },
+          getPrimaryItem() {
+            if (this.cart.length === 0) {
+              const qty = Number.parseInt(this.itemQty, 10);
+              const safeQty = Number.isNaN(qty) || qty < 1 ? 1 : qty;
+              return { name: this.selectedItem, qty: safeQty };
+            }
+
+            return this.cart[0];
+          },
+          async runSequence(steps) {
+            for (let idx = 0; idx < steps.length; idx += 1) {
+              const step = steps[idx];
+              this.currentStepIndex = idx;
+              this.activeNode = step.node;
+              this.activeLink = step.link;
+              this.currentPacketTag = step.tag;
+              this.processMessage =
+                step.label || "Memproses komunikasi antar service...";
+              await new Promise((r) => setTimeout(r, 700));
+            }
+            this.activeNode = "client";
+            this.activeLink = "";
+            this.currentPacketTag = "";
+            this.currentStepIndex = -1;
+          },
+          async processOrder() {
+            this.loading = true;
+            this.processMessage = "Mulai mengirim pesanan ke sistem...";
+            const flowSteps = this.modelFlowSteps;
+
+            if (!this.selectedOutlet) {
+              alert("Pilih outlet terlebih dulu.");
+              this.processMessage = "Gagal: outlet belum dipilih.";
+              this.loading = false;
+              return;
+            }
+
+            if (this.method === "delivery" && !this.address.trim()) {
+              alert("Isi alamat pengiriman untuk metode delivery.");
+              this.processMessage = "Gagal: alamat delivery masih kosong.";
+              this.loading = false;
+              return;
+            }
+
+            const primaryItem = this.getPrimaryItem();
+
+            try {
+              await fetch("/send", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  mode: this.mode,
+                  customer: this.selectedOutlet.name,
+                  drink: primaryItem.name,
+                  quantity: primaryItem.qty,
+                  method: this.method,
+                  address: this.address,
+                  note: this.address,
+                }),
+              });
+              await this.runSequence(flowSteps);
+              this.refresh();
+              this.cart = [];
+              this.processMessage = "Pesanan berhasil dikirim dan diproses.";
+            } catch (error) {
+              this.processMessage = "Terjadi kendala saat mengirim pesanan.";
+              this.activeLink = "";
+              this.currentPacketTag = "";
+              this.currentStepIndex = -1;
+            } finally {
+              this.loading = false;
+            }
+          },
+          async refresh() {
+            const [s, l] = await Promise.all([
+              fetch("/stats").then((r) => r.json()),
+              fetch("/log").then((r) => r.json()),
+            ]);
+            this.stats = s;
+            this.logs = l.reverse();
+            this.$nextTick(() => {
+              const el = document.getElementById("console");
+              el.scrollTop = 0;
+            });
+          },
+        },
+        mounted() {
+          this.refresh();
+          setInterval(this.refresh, 3000);
+        },
+      }).mount("#app");
+    </script>
+  </body>
+</html>
